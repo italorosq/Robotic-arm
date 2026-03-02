@@ -1,19 +1,15 @@
-﻿# Projeto Braço Robótico
+# Projeto Braço Robótico
 
-![Fase](https://img.shields.io/badge/fase-estrutura%C3%A7%C3%A3o-blue)
-![Status](https://img.shields.io/badge/status-em%20desenvolvimento-orange)
-![Licença](https://img.shields.io/badge/licen%C3%A7a-pendente-lightgrey)
+Repositório do desenvolvimento de um braço robótico com controle por visão computacional e comunicação entre ESPs usando ESP-NOW.
 
-Neste repositório, construímos um braço robótico com controle distribuído em ESPs, comunicação via ESP-NOW e integração com visão computacional.
+## Direção técnica
 
-## Escopo técnico
+- Controle de motores distribuído em ESPs.
+- Comunicação sem fio via ESP-NOW.
+- Supervisão e tomada de decisão baseada em visão computacional.
+- Estrutura enxuta para começar rápido e evoluir conforme o projeto avança.
 
-- Controlamos as juntas com nós embarcados independentes
-- Trocamos comandos e telemetria entre nós via ESP-NOW
-- Integramos visão computacional para gerar comandos de movimento
-- Registramos telemetria para monitoramento e diagnóstico
-
-## Estrutura do repositório
+## Estrutura de pastas
 
 ```text
 .
@@ -26,85 +22,46 @@ Neste repositório, construímos um braço robótico com controle distribuído e
     └── redutor-planetario/
 ```
 
-## Organização por domínio
+## Organização
 
-- `codigo/esp-firmware`: mantemos o firmware dos nós embarcados
-- `codigo/visao-computacional`: mantemos captura, processamento e emissão de comandos
-- `hardware/eletronica`: mantemos esquemas elétricos, pinagem e BOM
-- `hardware/esqueleto`: mantemos estrutura mecânica, suportes e interfaces
-- `hardware/redutor-planetario`: mantemos documentação e arquivos do redutor
+- `hardware/eletronica`: esquemas, pinagem, ligações e lista de componentes.
+- `hardware/redutor-planetario`: peças, e revisões do redutor planetário.
+- `hardware/esqueleto`: estrutura mecânica principal do braço (bases, elos, suportes).
+- `codigo/esp-firmware`: firmware dos ESPs (sem implementação neste momento).
+- `codigo/visao-computacional`: scripts e experimentos de visão computacional (sem implementação neste momento).
 
-## Arquitetura operacional
+## Próximos passos
 
-1. Capturamos a cena e estimamos alvo/pose no módulo de visão.
-2. Convertemos a saída da visão em comandos de movimento.
-3. Distribuímos comandos do nó mestre para os nós atuadores via ESP-NOW.
-4. Executamos controle local das juntas nos nós atuadores.
-5. Consolidamos telemetria no nó mestre para supervisão.
+1. Definir arquitetura de nós ESP (quem comanda cada motor).
+2. Definir protocolo de mensagens ESP-NOW (IDs, comandos e telemetria).
+3. Definir pipeline de visão computacional (entrada, detecção e saída de comando).
 
-## Topologia de nós
+## Arquitetura 
 
-- `ESP Mestre`: coordenamos o ciclo de controle, roteamos comandos e agregamos telemetria
-- `ESP Atuador A`: controlamos a junta da base
-- `ESP Atuador B`: controlamos as juntas de ombro e cotovelo
-- `ESP Atuador C` (opcional): controlamos punho e garra
 
-## Contrato mínimo de mensagens
+1. Câmera e processamento de visão no computador identificam alvo/pose.
+2. Computador gera comando de movimento (posição, velocidade ou ação).
+3. ESP Mestre recebe/computa o comando final e distribui aos ESPs de atuadores via ESP-NOW.
+4. ESPs de atuadores controlam motores locais e retornam telemetria.
+5. ESP Mestre consolida estado e envia status para supervisão.
 
-- `Comando`: id do nó, tipo de ação, setpoint, limite de velocidade, timestamp
-- `Telemetria`: id do nó, posição atual, velocidade atual, erro/corrente, timestamp
-- `Heartbeat`: presença do nó e estado da comunicação
+## Responsabilidades
 
-## Requisitos de engenharia
+- ESP Mestre (coordenação):
+    - receber comando da camada de visão;
+    - distribuir comandos para os nós de motor;
+    - sincronizar ciclo de controle;
+    - consolidar telemetria e estado do braço.
 
-- Garantimos falha segura em caso de perda de comunicação
-- Mantemos payload compatível com os limites do ESP-NOW
-- Trabalhamos com frequência de atualização determinística no ciclo de controle
-- Versionamos o protocolo para manter compatibilidade entre nós
+- ESP Atuador A (base/rotação):
+    - controlar motor da junta da base;
+    - reportar posição, velocidade e falhas.
 
-## Marcos e prazos
+- ESP Atuador B (ombro/cotovelo):
+    - controlar motores dos elos principais;
+    - reportar posição, velocidade e falhas.
 
-| Etapa | Entrega | Status | Prazo alvo |
-|---|---|---|---|
-| M1 | Mapa de atuadores e topologia final de nós | Em andamento | 2026-03-15 |
-| M2 | Protocolo ESP-NOW versionado (comando, telemetria, heartbeat) | Pendente | 2026-03-29 |
-| M3 | Controle local estável em bancada (1 junta) | Pendente | 2026-04-12 |
-| M4 | Integração visão computacional + ESP mestre | Pendente | 2026-04-26 |
-| M5 | Validação fim a fim com fail-safe e telemetria | Pendente | 2026-05-10 |
-
-## Critérios de aceite por etapa
-
-### M1 - Arquitetura de nós
-
-- Documentamos a topologia de nós no repositório
-- Definimos a junta atendida por cada nó
-- Definimos a interface entre supervisor e nó mestre
-
-### M2 - Protocolo de mensagens
-
-- Documentamos os pacotes com campos e tipos
-- Declaramos e validamos a versão do protocolo
-- Executamos teste de envio e recebimento entre pelo menos 2 nós
-
-### M3 - Controle local
-
-- Validamos resposta da junta de teste a setpoint de posição e velocidade
-- Entregamos telemetria periódica sem perda crítica
-- Validamos fail-safe em perda de comunicação
-
-### M4 - Integração com visão
-
-- Garantimos que o pipeline de visão gere comando compatível com o protocolo
-- Validamos recepção e distribuição de comandos pelo nó mestre
-- Registramos latência ponta a ponta
-
-### M5 - Validação fim a fim
-
-- Executamos ciclo completo com pelo menos 2 juntas
-- Consolidamos telemetria no nó mestre sem inconsistências
-- Aprovamos procedimentos de falha segura em teste funcional
-
-## Licença
-
-Ainda não definimos a licença.
+- ESP Atuador C (punho/garra, opcional):
+    - controlar extremidade (punho e efetuador final);
+    - reportar posição, velocidade e falhas.
 
