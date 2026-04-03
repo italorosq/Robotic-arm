@@ -1,29 +1,28 @@
-﻿# Redutor Planetário
+﻿# Redutor Planetario
 
-![Módulo](https://img.shields.io/badge/m%C3%B3dulo-transmiss%C3%A3o%20mec%C3%A2nica-6b7280)
-![Status](https://img.shields.io/badge/status-refer%C3%AAncia%20base-blue)
+Subpasta para documentacao e arquivos de referencia do conjunto de transmissao com redutor planetario.
 
-Nesta pasta, guardamos a documentação e os arquivos de referência do redutor planetário usado no braço robótico.
+## Conteudo
 
-## Escopo
+- robot-actuators-model_files.zip
 
-- Mantemos os arquivos base do conjunto de atuadores e redutor
-- Registramos a origem dos modelos para rastreabilidade
-- Damos suporte à integração mecânica nas juntas
+## Aplicacao no projeto
 
-## Conteúdo
+O redutor planetario aumenta torque na junta e melhora a resolucao do movimento, ajudando no controle fino em malha fechada.
 
-- `robot-actuators-model_files.zip`: pacote com os arquivos de referência que usamos
+## Checklist de integracao
 
-## Aplicação no projeto
+- [ ] Definir relacao de reducao alvo por junta.
+- [ ] Verificar limite de torque e folga mecanica.
+- [ ] Validar acoplamento entre motor, redutor e eixo da junta.
+- [ ] Testar backlash em movimentos de ida e volta.
+- [ ] Registrar revisao de montagem e ajustes necessarios.
 
-Usamos o redutor planetário para aumentar torque e melhorar a resolução de movimento nas juntas, mantendo o conjunto compacto para integração no esqueleto mecânico.
+## Creditos e origem
 
-## Créditos e origem
-
-Usamos como base os arquivos publicados em:
+Arquivos de referencia baseados em:
 
 - https://www.printables.com/model/132262-robot-actuators/files
 
-Atribuímos todo o crédito do modelo base ao autor original na plataforma Printables.
+Credito total ao autor original do modelo publicado no Printables.
 

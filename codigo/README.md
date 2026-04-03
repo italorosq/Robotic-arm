@@ -1,15 +1,6 @@
-﻿# Código
+﻿# Codigo
 
-![Domínio](https://img.shields.io/badge/dom%C3%ADnio-software-0a7ea4)
-![Status](https://img.shields.io/badge/status-em%20planejamento-orange)
-
-Nesta pasta, concentramos a parte de software do projeto: firmware embarcado, supervisão e integração com visão computacional.
-
-## Escopo
-
-- Desenvolvemos firmware dos nós ESP para controle distribuído de atuadores
-- Implementamos pipeline de visão para detecção e geração de comandos
-- Mantemos a interface de comunicação entre supervisor e rede ESP-NOW
+Camada de software do projeto: firmware dos ESP32, visao computacional e logica de supervisao em malha fechada.
 
 ## Estrutura
 
@@ -19,44 +10,46 @@ codigo/
 └── visao-computacional/
 ```
 
-## Organização por módulo
+## Responsabilidades por modulo
 
-- `esp-firmware`: desenvolvemos firmware do nó mestre e dos nós atuadores
-- `visao-computacional`: desenvolvemos captura, processamento e emissão de comandos
+- esp-firmware: controle local das juntas, comunicacao entre nos e telemetria.
+- visao-computacional: captura de imagem, deteccao de alvo/pose e geracao de comando.
 
-## Marcos e prazos
+## Lista BOM de software
 
-| Etapa | Entrega | Status | Prazo alvo |
-|---|---|---|---|
-| C1 | Estrutura base dos módulos e convenções de código | Em andamento | 2026-03-15 |
-| C2 | Definição e implementação inicial do protocolo de mensagens | Pendente | 2026-03-29 |
-| C3 | Controle local de 1 atuador via firmware | Pendente | 2026-04-12 |
-| C4 | Integração supervisor de visão + nó mestre | Pendente | 2026-04-26 |
-| C5 | Validação de telemetria e fail-safe no fluxo completo | Pendente | 2026-05-10 |
+### Firmware (ESP32)
 
-## Critérios de aceite
+- Framework: Arduino Core para ESP32 ou ESP-IDF
+- Comunicacao: ESP-NOW (ou Wi-Fi local como alternativa)
+- Bibliotecas de controle: PID, filtro e encoder conforme atuador
 
-### C1 - Estrutura base
+### Visao e supervisao
 
-- Definimos organização final de diretórios
-- Documentamos convenções mínimas de versionamento e nomenclatura
+- Python 3.10+
+- OpenCV
+- Numpy
+- Biblioteca de comunicacao com no mestre (serial, UDP ou MQTT local)
+- Ferramenta de log e plot (csv + script, ou dashboard simples)
 
-### C2 - Protocolo
+## Interface minima entre visao e firmware
 
-- Implementamos campos obrigatórios de comando, telemetria e heartbeat
-- Verificamos compatibilidade de versão entre módulos
+- Comando: id_junta, setpoint, modo_controle, timestamp.
+- Telemetria: posicao, velocidade, corrente estimada, status_falha, timestamp.
+- Heartbeat: versao_protocolo, uptime, estado do no.
 
-### C3 - Controle local
+## Checklist de implementacao (software)
 
-- Validamos resposta estável do atuador a setpoint
-- Publicamos telemetria periódica sem falhas críticas
+- [ ] Definir formato de mensagem e versao do protocolo.
+- [ ] Criar firmware base do no mestre com roteamento de comandos.
+- [ ] Criar firmware base de 1 no atuador com telemetria.
+- [ ] Implementar watchdog e fail-safe nos nos.
+- [ ] Implementar pipeline de visao com deteccao inicial.
+- [ ] Converter erro de visao em comando de junta.
+- [ ] Integrar fluxo completo com log de latencia.
+- [ ] Criar testes de regressao para protocolo e parse de mensagens.
 
-### C4 - Integração
+## Entrega minima valida
 
-- Validamos chegada de comando da visão ao nó atuador via nó mestre
-- Registramos latência ponta a ponta em teste
-
-### C5 - Validação
-
-- Executamos fluxo completo com telemetria consolidada
-- Validamos fail-safe em cenário de perda de comunicação
+1. Um alvo detectado em video gera setpoint de movimento.
+2. No mestre encaminha comando para 1 atuador.
+3. Atuador executa e retorna telemetria estavel por pelo menos 5 minutos.
